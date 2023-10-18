@@ -36,7 +36,7 @@ const AssignmentGroup = {
 const LearnerSubmissions = [
     {
         learner_id: 125,
-        assignment_id: 1,
+        assignment_id: 'a',//1,
         submission: {
             submitted_at: "2023-01-25",
             score: 47
@@ -75,6 +75,14 @@ const LearnerSubmissions = [
         }
     }
 ];
+let checkSubmissions = function() {
+    for (let i2 = 0; i2 < LearnerSubmissions.length; i2++) {
+        if (isNaN(LearnerSubmissions[i2].learner_id || isNaN(LearnerSubmissions[i2].assignment_id))) {
+            throw 'Learner Submission - Learner ID and Assignment ID should be numeric';
+            return false;
+        }
+    }
+}
 
 let checkInput = function() {
     if (AssignmentGroup.course_id !== CourseInfo.id) {
@@ -98,12 +106,12 @@ let checkInput = function() {
         return false;
     }     
     else { // Check Object --> Array --> Object 
-        for (let ind1 = 0; ind1 < AssignmentGroup.AssignmentInfo.length; ind1++) {
-            if (isNaN(AssignmentGroup.AssignmentInfo[ind1].id || isNaN(AssignmentGroup.AssignmentInfo[ind1].points_possible))) {
+        for (let i1 = 0; i1 < AssignmentGroup.AssignmentInfo.length; i1++) {
+            if (isNaN(AssignmentGroup.AssignmentInfo[i1].id || isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible))) {
                 throw 'The Assignment Info\'s ID, and Possible Point fields, expect numeric values';
                 return false;
             }
-            else if (AssignmentGroup.AssignmentInfo[ind1].name.length === 0) {
+            else if (AssignmentGroup.AssignmentInfo[i1].name.length === 0) {
                 throw 'Please enter an assignment info name'
                 return false;
             }             
@@ -111,16 +119,10 @@ let checkInput = function() {
     } 
     return true;
 }
-
-    // else if (isNaN()) {
-        // return false;
-
-    //  }
-//}
-
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
     for (const ag in AssignmentGroup) {
         checkInput()
+        checkSubmissions()
         // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
     }        
     console.log('LOVE Jesus')
