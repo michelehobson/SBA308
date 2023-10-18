@@ -36,7 +36,7 @@ const AssignmentGroup = {
 const LearnerSubmissions = [
     {
         learner_id: 125,
-        assignment_id: 'a',//1,
+        assignment_id: 1,
         submission: {
             submitted_at: "2023-01-25",
             score: 47
@@ -77,7 +77,7 @@ const LearnerSubmissions = [
 ];
 let checkSubmissions = function() {
     for (let i2 = 0; i2 < LearnerSubmissions.length; i2++) {
-        if (isNaN(LearnerSubmissions[i2].learner_id || isNaN(LearnerSubmissions[i2].assignment_id))) {
+        if (isNaN(LearnerSubmissions[i2].learner_id) || isNaN(LearnerSubmissions[i2].assignment_id)) {
             throw 'Learner Submission - Learner ID and Assignment ID should be numeric';
             return false;
         }
@@ -97,7 +97,7 @@ let checkInput = function() {
         throw 'Please enter a course name'
         return false;
     } // Check AssignmentGroup
-    else if (isNaN(AssignmentGroup.id || isNaN(AssignmentGroup.course_id || isNaN(AssignmentGroup.group_weight)))) {
+    else if (isNaN(AssignmentGroup.id) || isNaN(AssignmentGroup.course_id) || isNaN(AssignmentGroup.group_weight)) {
         throw 'The Assignment Group ID, Course ID, and Group Weight fields, expect numeric values'
         return false;
     }
@@ -107,7 +107,7 @@ let checkInput = function() {
     }     
     else { // Check Object --> Array --> Object 
         for (let i1 = 0; i1 < AssignmentGroup.AssignmentInfo.length; i1++) {
-            if (isNaN(AssignmentGroup.AssignmentInfo[i1].id || isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible))) {
+            if (isNaN(AssignmentGroup.AssignmentInfo[i1].id) || isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible)) {
                 throw 'The Assignment Info\'s ID, and Possible Point fields, expect numeric values';
                 return false;
             }
@@ -128,8 +128,7 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
     console.log('LOVE Jesus')
 
 }
-// console.log(outcome(CourseInfo))
-// let results = getLearnerData(CourseInfo, AssignmentGroup)
+
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
 console.log(results);
 
