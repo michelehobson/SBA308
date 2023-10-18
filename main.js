@@ -18,7 +18,7 @@ const AssignmentGroup = {
             points_possible: 50
         },
         {
-            id: 'a',
+            id: 2,
             name: "Write a Function",
             due_at: "2023-02-27",
             points_possible: 150
@@ -84,18 +84,29 @@ let checkInput = function() {
     else if (isNaN(CourseInfo.id)) {
         throw 'Please enter a valid ID number for the course'
         return false;
+    } 
+    else if (CourseInfo.name.length === 0) {
+        throw 'Please enter a course name'
+        return false;
     } // Check AssignmentGroup
     else if (isNaN(AssignmentGroup.id || isNaN(AssignmentGroup.course_id || isNaN(AssignmentGroup.group_weight)))) {
         throw 'The Assignment Group ID, Course ID, and Group Weight fields, expect numeric values'
         return false;
     }
+    else if (AssignmentGroup.name.length === 0) {
+        throw 'Please enter an assignment group name'
+        return false;
+    }     
     else { // Check Object --> Array --> Object 
-        console.log(AssignmentGroup.AssignmentInfo.length)
         for (let ind1 = 0; ind1 < AssignmentGroup.AssignmentInfo.length; ind1++) {
             if (isNaN(AssignmentGroup.AssignmentInfo[ind1].id || isNaN(AssignmentGroup.AssignmentInfo[ind1].points_possible))) {
                 throw 'The Assignment Info\'s ID, and Possible Point fields, expect numeric values';
                 return false;
             }
+            else if (AssignmentGroup.AssignmentInfo[ind1].name.length === 0) {
+                throw 'Please enter an assignment info name'
+                return false;
+            }             
         }
     } 
     return true;
@@ -107,27 +118,17 @@ let checkInput = function() {
     //  }
 //}
 
-//Throw error if Assignment Group does not belong to its course id
-// let one = 1
-// let outcome = function getLearnerData(CourseInfo, AssignmentGroup, ...LearnerSubmissions) {
-// let outcome = function getLearnerData(CourseInfo) {
-
-// ||isNaN(AssignmentGroup.AssignmentInfo.id || isNaN()
-function getLearnerData(CourseInfo, AssignmentGroup) {
+let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
     for (const ag in AssignmentGroup) {
-        console.log(1)
-        let validInput = checkInput()
-        if (!(validInput)) {
-            console.log(2)
-            alert('Something ain\'t right')
-            return;
-        }
+        checkInput()
+        // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
+    }        
+    console.log('LOVE Jesus')
 
-    }
 }
 // console.log(outcome(CourseInfo))
-let results = getLearnerData(CourseInfo, AssignmentGroup)
-
+// let results = getLearnerData(CourseInfo, AssignmentGroup)
+let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
 console.log(results);
 
 
