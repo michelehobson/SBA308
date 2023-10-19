@@ -1,10 +1,8 @@
-// The provided course information.
 const CourseInfo = {
     id: 451,
     name: "Introduction to JavaScript"
 };
 
-// The provided assignment group.
 const AssignmentGroup = {
     id: 12345,
     name: "Fundamentals of JavaScript",
@@ -32,7 +30,6 @@ const AssignmentGroup = {
     ]
 };
 
-// The provided learner submission data.
 const LearnerSubmissions = [
     {
         learner_id: 125,
@@ -143,27 +140,18 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
         for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
                 let bypass = false, overdue = false;
+                let total = 0, pct = 0;
                 bypass = checkAgainstToday(AssignmentGroup.AssignmentInfo[i4].due_at, bypass)
                 console.log(bypass)
                 if (bypass) {
                     break;
-                } //else {
-                console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
-                console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
+                }
+                // console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
+                // console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
                 overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at, bypass, overdue)
-                //}
-                // if (!bypass) {
-                //     console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
-                //     console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
-                //     overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at, bypass, overdue)
-                // }
-
             }
-
         }
     }
-    // checkDates(AssignmentGroup.AssignmentInfo)
-
     checkAssignmentGrp()
     checkLearnerSubm()
     // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
