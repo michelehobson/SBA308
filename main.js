@@ -19,7 +19,7 @@ const AssignmentGroup = {
             id: 2,
             name: "Write a Function",
             due_at: "2023-02-27",
-            points_possible: -1//150
+            points_possible: 150
         },
         {
             id: 3,
@@ -39,14 +39,7 @@ const LearnerSubmissions = [
             score: 47
         }
     },
-    {
-        learner_id: 125,
-        assignment_id: 2,
-        submission: {
-            submitted_at: "2023-02-12",
-            score: 150
-        }
-    },
+
     {
         learner_id: 125,
         assignment_id: 3,
@@ -61,6 +54,14 @@ const LearnerSubmissions = [
         submission: {
             submitted_at: "2023-01-24",
             score: 39
+        }
+    },
+    {
+        learner_id: 125,
+        assignment_id: 2,
+        submission: {
+            submitted_at: "2023-02-12",
+            score: 150
         }
     },
     {
@@ -104,7 +105,7 @@ let checkAssignmentGrp = function (AssignmentGroup) {
     else if (CourseInfo.name.length === 0) {
         throw 'Please enter a course name'
         return false;
-    } 
+    }
     else if (isNaN(AssignmentGroup.id) || isNaN(AssignmentGroup.course_id) || isNaN(AssignmentGroup.group_weight)) {
         throw 'The Assignment Group ID, Course ID, and Group Weight fields, expect numeric values'
         return false;
@@ -137,7 +138,6 @@ let findFutureDueDates = function (dueDate) {
     let td = new Date();
     // If entered due date is => five years into the future, confirm that the entry was intentional
     let oneDay = 24 * 60 * 60 * 1000;
-    let daysBetween = Math.round(Math.abs(dd - td) / oneDay);
     let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
     if (yearsBetween >= 5) {
         let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
@@ -148,9 +148,16 @@ let findFutureDueDates = function (dueDate) {
     return dd.getTime() > td.getTime() ? true : false;
 }
 
+LearnerSubmissions.sort((a, b) => a.learner_id - b.learner_id)
+console.log(LearnerSubmissions)
+
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
+    // I'm passing the objects under the premise that they ARE NOT hardcoded
+    checkAssignmentGrp(AssignmentGroup)
+    checkLearnerSubm(LearnerSubmissions)
+
     for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
-        let total = 0, pct = 0, possPoints = 0, reduceBy10Pct = false, checkedDate = false;
+        let total = 0, pct = 0, possPoints = 0, reduceBy10Pct = false;
         for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
             let bypass = false, overdue = false;
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
@@ -166,11 +173,9 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
                 }
             }
         }
-
+        console.log(`Learner ID: ${LearnerSubmissions[i3].learner_id}`)
+        console.log(`Average: ${LearnerSubmissions[i3].submission.score}`)
     }
-    // I'm passing the objects under the premise that they ARE NOT hardcoded
-    checkAssignmentGrp(AssignmentGroup)
-    checkLearnerSubm(LearnerSubmissions)
 }
 
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
