@@ -76,31 +76,20 @@ const LearnerSubmissions = [
     }
 ];
 
-let checkDates = function (dueDate, subDate, type, bypass, overdue) {
-    for (let i2 = 0; i2 < LearnerSubmissions.length; i2++) {
-        let dd = new Date(dueDate);
-        let sd = new Date(subDate);
-        let td = new Date()
-        if (type === 1) {
-            if (dd.getTime < td.getTime) {
-                console.log('CONTINUE')
-            }
-            else {
-                console.log('BYPASS')
-                bypass = true;
-            }
-        }
-        else if (type === 2) {
-            if (dd.getTime > sd.getTime) {
-                console.log('OVERDUE')
-                overdue = true;
-            }
-        }
-
-        // console.log(dd + "\n" + sd + "\n" + td)
-        // cCDate = LearnerSubmissions[i2].submission.submitted_at;
-    }
+let checkAgainstToday = function (dueDate, bypass) {
+    let dd = new Date(dueDate);
+    let td = new Date()
+    // console.log('DOESN\'T COUNT\n' + dd + "\n" + td)
+    return dd.getTime() > td.getTime() ? true : false;
 }
+
+let checkAgainstSub = function (dueDate, subDate, overdue) {
+    let dd = new Date(dueDate);
+    let sd = new Date(subDate);
+    // console.log('DOESN\'T COUNT\n' + dd + "\n" + sd)
+    return dd.getTime() > sd.getTime() ? true : false;
+}
+
 let checkLearnerSubm = function () {
     for (const ls in LearnerSubmissions) {
         if (isNaN(LearnerSubmissions[ls].learner_id) || isNaN(LearnerSubmissions[ls].assignment_id)) {
@@ -150,10 +139,28 @@ let checkAssignmentGrp = function () {
     return true;
 }
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
-    // let 
-    for (let i3 = 0; i3 < AssignmentGroup.AssignmentInfo.length; i3++) {
-        console.log(AssignmentGroup.AssignmentInfo[i3].id)
-        checkDates(AssignmentGroup.AssignmentInfo[i3].due_at, LearnerSubmissions.submission)
+    for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
+        for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
+            if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
+                let bypass = false, overdue = false;
+                bypass = checkAgainstToday(AssignmentGroup.AssignmentInfo[i4].due_at, bypass)
+                console.log(bypass)
+                if (bypass) {
+                    break;
+                } //else {
+                console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
+                console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
+                overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at, bypass, overdue)
+                //}
+                // if (!bypass) {
+                //     console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
+                //     console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
+                //     overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at, bypass, overdue)
+                // }
+
+            }
+
+        }
     }
     // checkDates(AssignmentGroup.AssignmentInfo)
 
