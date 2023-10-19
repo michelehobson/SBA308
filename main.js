@@ -73,18 +73,26 @@ const LearnerSubmissions = [
     }
 ];
 
-let checkAgainstToday = function (dueDate, bypass) {
+let checkAgainstToday = function (dueDate) {
     let dd = new Date(dueDate);
-    let td = new Date()
-    // console.log('DOESN\'T COUNT\n' + dd + "\n" + td)
+    let td = new Date();
+    // If entered due date is => five years into the future, confirm that the entry was intentional
+    let oneDay = 24 * 60 * 60 * 1000;
+    let daysBetween = Math.round(Math.abs(dd - td) / oneDay);
+    let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
+    if (yearsBetween >= 5) {
+        let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
+        let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
+        // Check the user's response
+        response === null ? console.log("Cancel was chosen") : console.log("OK was chosen");
+    }
     return dd.getTime() > td.getTime() ? true : false;
 }
 
-let checkAgainstSub = function (dueDate, subDate, overdue) {
+let checkAgainstSub = function (dueDate, subDate) {
     let dd = new Date(dueDate);
     let sd = new Date(subDate);
-    // console.log('DOESN\'T COUNT\n' + dd + "\n" + sd)
-    return dd.getTime() > sd.getTime() ? true : false;
+    return dd.getTime() < sd.getTime() ? true : false;
 }
 
 let checkLearnerSubm = function () {
@@ -141,14 +149,15 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
                 let bypass = false, overdue = false;
                 let total = 0, pct = 0;
-                bypass = checkAgainstToday(AssignmentGroup.AssignmentInfo[i4].due_at, bypass)
-                console.log(bypass)
+                bypass = checkAgainstToday(AssignmentGroup.AssignmentInfo[i4].due_at)
+                console.log(bypass ? `${AssignmentGroup.AssignmentInfo[i4].due_at} BYPASSED` : '')
                 if (bypass) {
                     break;
                 }
-                // console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
-                // console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
-                overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at, bypass, overdue)
+                console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
+                console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
+                overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
+                console.log(overdue ? 'overdue' : '')
             }
         }
     }
