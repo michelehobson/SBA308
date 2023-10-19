@@ -19,7 +19,7 @@ const AssignmentGroup = {
             id: 2,
             name: "Write a Function",
             due_at: "2023-02-27",
-            points_possible: 150
+            points_possible: -1//150
         },
         {
             id: 3,
@@ -73,29 +73,13 @@ const LearnerSubmissions = [
     }
 ];
 
-let checkAgainstToday = function (dueDate) {
-    let dd = new Date(dueDate);
-    let td = new Date();
-    // If entered due date is => five years into the future, confirm that the entry was intentional
-    let oneDay = 24 * 60 * 60 * 1000;
-    let daysBetween = Math.round(Math.abs(dd - td) / oneDay);
-    let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
-    if (yearsBetween >= 5) {
-        let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
-        let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
-        // Check the user's response
-        response === null ? console.log("Cancel was chosen") : console.log("OK was chosen");
-    }
-    return dd.getTime() > td.getTime() ? true : false;
-}
-
-let checkAgainstSub = function (dueDate, subDate) {
+let checkForOverdue = function (dueDate, subDate) {
     let dd = new Date(dueDate);
     let sd = new Date(subDate);
     return dd.getTime() < sd.getTime() ? true : false;
 }
 
-let checkLearnerSubm = function () {
+let checkLearnerSubm = function (LearnerSubmissions) {
     for (const ls in LearnerSubmissions) {
         if (isNaN(LearnerSubmissions[ls].learner_id) || isNaN(LearnerSubmissions[ls].assignment_id)) {
             throw 'Learner Submission - Learner ID and Assignment ID should be numeric';
@@ -108,11 +92,11 @@ let checkLearnerSubm = function () {
     }
 }
 
-let checkAssignmentGrp = function () {
+let checkAssignmentGrp = function (AssignmentGroup) {
     if (AssignmentGroup.course_id !== CourseInfo.id) {
         throw 'Invalid input';
         return false;
-    } //Check CourseInfo
+    }
     else if (isNaN(CourseInfo.id)) {
         throw 'Please enter a valid ID number for the course'
         return false;
@@ -120,7 +104,7 @@ let checkAssignmentGrp = function () {
     else if (CourseInfo.name.length === 0) {
         throw 'Please enter a course name'
         return false;
-    } // Check AssignmentGroup
+    } 
     else if (isNaN(AssignmentGroup.id) || isNaN(AssignmentGroup.course_id) || isNaN(AssignmentGroup.group_weight)) {
         throw 'The Assignment Group ID, Course ID, and Group Weight fields, expect numeric values'
         return false;
@@ -129,10 +113,14 @@ let checkAssignmentGrp = function () {
         throw 'Please enter an assignment group name'
         return false;
     }
-    else { // Check Object --> Array --> Object 
+    else {
         for (let i1 = 0; i1 < AssignmentGroup.AssignmentInfo.length; i1++) {
             if (isNaN(AssignmentGroup.AssignmentInfo[i1].id) || isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible)) {
                 throw 'The Assignment Info\'s ID, and Possible Point fields, expect numeric values';
+                return false;
+            }
+            else if (isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible) || AssignmentGroup.AssignmentInfo[i1].points_possible <= 0) {
+                throw 'Maximum points possible is used in a calculation, please enter a number greater than zero'
                 return false;
             }
             else if (AssignmentGroup.AssignmentInfo[i1].name.length === 0) {
@@ -143,29 +131,46 @@ let checkAssignmentGrp = function () {
     }
     return true;
 }
+
+let findFutureDueDates = function (dueDate) {
+    let dd = new Date(dueDate);
+    let td = new Date();
+    // If entered due date is => five years into the future, confirm that the entry was intentional
+    let oneDay = 24 * 60 * 60 * 1000;
+    let daysBetween = Math.round(Math.abs(dd - td) / oneDay);
+    let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
+    if (yearsBetween >= 5) {
+        let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
+        let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
+        // Check the user's response and add code ...
+        response === null ? console.log("Reenter date.") : console.log("Future date accepted.");
+    }
+    return dd.getTime() > td.getTime() ? true : false;
+}
+
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
     for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
+        let total = 0, pct = 0, possPoints = 0, reduceBy10Pct = false, checkedDate = false;
         for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
+            let bypass = false, overdue = false;
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
-                let bypass = false, overdue = false;
-                let total = 0, pct = 0;
-                bypass = checkAgainstToday(AssignmentGroup.AssignmentInfo[i4].due_at)
-                console.log(bypass ? `${AssignmentGroup.AssignmentInfo[i4].due_at} BYPASSED` : '')
+                bypass = findFutureDueDates(AssignmentGroup.AssignmentInfo[i4].due_at)
                 if (bypass) {
                     break;
                 }
-                console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
-                console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
-                overdue = checkAgainstSub(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
-                console.log(overdue ? 'overdue' : '')
+                // console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
+                // console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
+                overdue = checkForOverdue(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
+                if (overdue) {
+                    reduceBy10Pct = true;
+                }
             }
         }
-    }
-    checkAssignmentGrp()
-    checkLearnerSubm()
-    // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
-    console.log('LOVE Jesus')
 
+    }
+    // I'm passing the objects under the premise that they ARE NOT hardcoded
+    checkAssignmentGrp(AssignmentGroup)
+    checkLearnerSubm(LearnerSubmissions)
 }
 
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
