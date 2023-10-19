@@ -75,16 +75,46 @@ const LearnerSubmissions = [
         }
     }
 ];
-let checkSubmissions = function() {
+
+let checkDates = function (dueDate, subDate, type, bypass, overdue) {
     for (let i2 = 0; i2 < LearnerSubmissions.length; i2++) {
-        if (isNaN(LearnerSubmissions[i2].learner_id) || isNaN(LearnerSubmissions[i2].assignment_id)) {
+        let dd = new Date(dueDate);
+        let sd = new Date(subDate);
+        let td = new Date()
+        if (type === 1) {
+            if (dd.getTime < td.getTime) {
+                console.log('CONTINUE')
+            }
+            else {
+                console.log('BYPASS')
+                bypass = true;
+            }
+        }
+        else if (type === 2) {
+            if (dd.getTime > sd.getTime) {
+                console.log('OVERDUE')
+                overdue = true;
+            }
+        }
+
+        // console.log(dd + "\n" + sd + "\n" + td)
+        // cCDate = LearnerSubmissions[i2].submission.submitted_at;
+    }
+}
+let checkLearnerSubm = function () {
+    for (const ls in LearnerSubmissions) {
+        if (isNaN(LearnerSubmissions[ls].learner_id) || isNaN(LearnerSubmissions[ls].assignment_id)) {
             throw 'Learner Submission - Learner ID and Assignment ID should be numeric';
+            return false;
+        }
+        else if (isNaN(LearnerSubmissions[ls].submission.score)) {
+            throw 'Learner Submission - the score must be numeric';
             return false;
         }
     }
 }
 
-let checkInput = function() {
+let checkAssignmentGrp = function () {
     if (AssignmentGroup.course_id !== CourseInfo.id) {
         throw 'Invalid input';
         return false;
@@ -92,7 +122,7 @@ let checkInput = function() {
     else if (isNaN(CourseInfo.id)) {
         throw 'Please enter a valid ID number for the course'
         return false;
-    } 
+    }
     else if (CourseInfo.name.length === 0) {
         throw 'Please enter a course name'
         return false;
@@ -104,7 +134,7 @@ let checkInput = function() {
     else if (AssignmentGroup.name.length === 0) {
         throw 'Please enter an assignment group name'
         return false;
-    }     
+    }
     else { // Check Object --> Array --> Object 
         for (let i1 = 0; i1 < AssignmentGroup.AssignmentInfo.length; i1++) {
             if (isNaN(AssignmentGroup.AssignmentInfo[i1].id) || isNaN(AssignmentGroup.AssignmentInfo[i1].points_possible)) {
@@ -114,17 +144,22 @@ let checkInput = function() {
             else if (AssignmentGroup.AssignmentInfo[i1].name.length === 0) {
                 throw 'Please enter an assignment info name'
                 return false;
-            }             
+            }
         }
-    } 
+    }
     return true;
 }
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
-    for (const ag in AssignmentGroup) {
-        checkInput()
-        checkSubmissions()
-        // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
-    }        
+    // let 
+    for (let i3 = 0; i3 < AssignmentGroup.AssignmentInfo.length; i3++) {
+        console.log(AssignmentGroup.AssignmentInfo[i3].id)
+        checkDates(AssignmentGroup.AssignmentInfo[i3].due_at, LearnerSubmissions.submission)
+    }
+    // checkDates(AssignmentGroup.AssignmentInfo)
+
+    checkAssignmentGrp()
+    checkLearnerSubm()
+    // IT CONTINUES IF THE INPUT IS VALID. STRAAAANNNNGGGGE
     console.log('LOVE Jesus')
 
 }
