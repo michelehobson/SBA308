@@ -22,6 +22,17 @@ Extras:
 3. Ensured values were entered for CourseInfo and AssignmentGroup name fields.
 4. Created a helper function to validate input
 5. Added logic to use possible points in overall average calculation from missed exams. 
+   
+   
+    *** Note: I ran out of time, but ONLY if I add additional exams to the Assignment Group object I receive:
+        TypeError: Cannot set properties of undefined (setting '0')
+            at loadArray (main.js:225:25)
+            at getLearnerData (main.js:213:25)
+            at main.js:291:15.
+
+        Adding data to JavaScript arrays is quirkkkky!
+
+
 
 
 GitHub Link:

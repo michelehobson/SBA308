@@ -32,7 +32,7 @@ const AssignmentGroup = {
             due_at: "3156-11-15",
             points_possible: 500
         }
-        // ,{
+        // {
         //     id: 3,
         //     name: "Do Something",
         //     due_at: "2023-01-27",
