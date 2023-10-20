@@ -1,6 +1,6 @@
 let row = 0;
 let col = 5;
-let learner = [[],[]];
+let learner = [[], []];
 
 const CourseInfo = {
     id: 451,
@@ -161,11 +161,11 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
 
     let learnerID = LearnerSubmissions[0].learner_id;
     for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
-        if (LearnerSubmissions[i3].learner_id !== learnerID) {
-            printResults();
-            learner = [[],[]]
-            row = 0;
+        if (LearnerSubmissions[i3].learner_id !== learnerID || i3 === LearnerSubmissions.length - 1) {
             learnerID = LearnerSubmissions[i3].learner_id;
+            printResults();
+            learner = [[], []]
+            row = 0;
         }
         let total = 0, pct = 0, possPoints = 0, bypassed = false;
         let bypass = false, overdue = false;
@@ -179,10 +179,10 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
                 }
                 overdue = checkForOverdue(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
 
-                loadArray(LearnerSubmissions[i3].learner_id, 
-                          LearnerSubmissions[i3].submission.score,
-                          AssignmentGroup.AssignmentInfo[i4].points_possible,
-                          overdue)
+                loadArray(LearnerSubmissions[i3].learner_id,
+                    LearnerSubmissions[i3].submission.score,
+                    AssignmentGroup.AssignmentInfo[i4].points_possible,
+                    overdue)
                 // learner[row][0] = LearnerSubmissions[i3].learner_id;
                 // learner[row][1] = LearnerSubmissions[i3].submission.score;
                 // overdue ? learner[row][2] = true : learner[row][2] = false;
@@ -197,18 +197,43 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
 function loadArray(id, score, points, overdue) {
     learner[row][0] = id;
     learner[row][1] = score
-    learner[row][2] = overdue
-    learner[row][3] = points
+    learner[row][2] = points
+    learner[row][3] = overdue
     learner[row][4] = row + 1
-    console.log(id)
-    console.log(score)
-    console.log(overdue)
-    console.log(points)
-    console.log(row + 1)
+    // console.log(id)
+    // console.log(score)
+    // console.log(points)
+    // console.log(overdue)
+    // console.log(row + 1)
+    // console.log(`*******************`)
     ++row;
 }
 function printResults() {
-    let total = 0;
-    
+
+    // console.log(learner.length)
+
+    // for (let a = 0; a < learner.length; a++) {
+    //     console.log(learner[a][0])
+    //     console.log(learner[a][1])
+    //     console.log(learner[a][2])
+    //     console.log(learner[a][3])
+    //     console.log(learner[a][4])
+    // }
+
+    let totalScore = 0, totalPoints = 0;
+
+    console.log(`Learner ID: ${learner[0][0]}`)
+
+    for (let a = 0; a < learner.length; a++) {
+        totalScore += learner[a][1];
+        totalPoints += learner[a][2];
+    }
+
+    console.log(`Total Average: ${totalScore / totalPoints}`);
+
+    for (let b = 0; b < learner.length; b++) {
+        console.log(`Asgmt. Score: ${learner[b][1] / learner[b][2]}`);
+    }
+    console.log(`*******************`)
 }
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
