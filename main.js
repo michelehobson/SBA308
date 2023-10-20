@@ -1,3 +1,7 @@
+let row = 0;
+let col = 5;
+let learner = [[],[]];
+
 const CourseInfo = {
     id: 451,
     name: "Introduction to JavaScript"
@@ -155,38 +159,56 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
     checkAssignmentGrp(AssignmentGroup)
     checkLearnerSubm(LearnerSubmissions)
 
-    let row = 0;
-    let col = 2;
-    let learner = [[], []];
-    let firstLearner = LearnerSubmissions[0].learner_id;
+    let learnerID = LearnerSubmissions[0].learner_id;
     for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
-        let total = 0, pct = 0, possPoints = 0, reduceBy10Pct = false;
+        if (LearnerSubmissions[i3].learner_id !== learnerID) {
+            printResults();
+            learner = [[],[]]
+            row = 0;
+            learnerID = LearnerSubmissions[i3].learner_id;
+        }
+        let total = 0, pct = 0, possPoints = 0, bypassed = false;
         let bypass = false, overdue = false;
         for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
             bypass = false, overdue = false;
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
                 bypass = findFutureDueDates(AssignmentGroup.AssignmentInfo[i4].due_at)
                 if (bypass) {
+                    bypassed = true;
                     break;
                 }
                 overdue = checkForOverdue(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
-                if (overdue) {
-                    reduceBy10Pct = true;
-                }
-            }
-        }
-        if (!(bypass)) {
-            if (i3 > 0 && LearnerSubmissions[i3].learner_id !== LearnerSubmissions[i3 - 1].learner_id) {
-                ++row;
-                col = 0;
 
+                loadArray(LearnerSubmissions[i3].learner_id, 
+                          LearnerSubmissions[i3].submission.score,
+                          AssignmentGroup.AssignmentInfo[i4].points_possible,
+                          overdue)
+                // learner[row][0] = LearnerSubmissions[i3].learner_id;
+                // learner[row][1] = LearnerSubmissions[i3].submission.score;
+                // overdue ? learner[row][2] = true : learner[row][2] = false;
+                // console.log(`Learner ID: ${learner[row][0]}`)
+                // console.log(`Average: ${learner[row][1]}`)
+                // console.log(`${row}: ${learner[row][2]}`)
             }
-            learner[row][col] = LearnerSubmissions[i3].learner_id;
-            learner[row][++col] = LearnerSubmissions[i3].submission.score;
-            console.log(`Learner ID: ${LearnerSubmissions[i3].learner_id}`)
-            console.log(`Average: ${LearnerSubmissions[i3].submission.score}`)
         }
     }
 }
 
+function loadArray(id, score, points, overdue) {
+    learner[row][0] = id;
+    learner[row][1] = score
+    learner[row][2] = overdue
+    learner[row][3] = points
+    learner[row][4] = row + 1
+    console.log(id)
+    console.log(score)
+    console.log(overdue)
+    console.log(points)
+    console.log(row + 1)
+    ++row;
+}
+function printResults() {
+    let total = 0;
+    
+}
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
