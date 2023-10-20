@@ -1,6 +1,7 @@
 let row = 0;
 let col = 5;
 let learner = [[], []];
+let nbrOfValidAsgmts = 0;
 
 const CourseInfo = {
     id: 451,
@@ -31,6 +32,18 @@ const AssignmentGroup = {
             due_at: "3156-11-15",
             points_possible: 500
         }
+        // ,{
+        //     id: 3,
+        //     name: "Do Something",
+        //     due_at: "2023-01-27",
+        //     points_possible: 150
+        // },        
+        // {
+        //     id: 4,
+        //     name: "Code the World",
+        //     due_at: "3156-11-15",
+        //     points_possible: 500
+        // }
     ]
 };
 
@@ -141,6 +154,18 @@ let validateInput = function (CourseInfo, AssignmentGroup, LearnerSubmissions) {
     return true;
 }
 
+let countUsableDates = function (AssignmentGroup) {
+    let tmp = 0;
+    for (let count = 0; count < AssignmentGroup.AssignmentInfo.length; count++) {
+        let dd = new Date(AssignmentGroup.AssignmentInfo[count].due_at);
+        let td = new Date();
+        if (dd.getTime() <= td.getTime()) {
+            nbrOfValidAsgmts += 1;
+        }
+    }
+    return nbrOfValidAsgmts;
+}
+
 let findFutureDueDates = function (dueDate) {
     let dd = new Date(dueDate);
     let td = new Date();
@@ -162,6 +187,7 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
     try {
         // I'm passing the objects under the premise that they ARE NOT hardcoded
         validateInput(CourseInfo, AssignmentGroup, LearnerSubmissions)
+        nbrOfValidAsgmts = countUsableDates(AssignmentGroup)
         learner.length = 1;
         let learnerID = LearnerSubmissions[0].learner_id;
         for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
@@ -181,10 +207,10 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
 
                     if (i3 === LearnerSubmissions.length - 1) {
                         learnerID = LearnerSubmissions[i3].learner_id;
-                        loadArray(LearnerSubmissions[i3].learner_id, LearnerSubmissions[i3].submission.score, AssignmentGroup.AssignmentInfo[i4].points_possible, overdue);
+                        loadArray(LearnerSubmissions[i3].learner_id, LearnerSubmissions[i3].submission.score, AssignmentGroup.AssignmentInfo[i4].points_possible, LearnerSubmissions[i3].assignment_id, overdue);
                         printResults(AssignmentGroup);
                     } else {
-                        loadArray(LearnerSubmissions[i3].learner_id, LearnerSubmissions[i3].submission.score, AssignmentGroup.AssignmentInfo[i4].points_possible, overdue);
+                        loadArray(LearnerSubmissions[i3].learner_id, LearnerSubmissions[i3].submission.score, AssignmentGroup.AssignmentInfo[i4].points_possible, LearnerSubmissions[i3].assignment_id, overdue);
                     }
                 }
             }
@@ -194,13 +220,13 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
     }
 }
 
-function loadArray(id, score, points, overdue) {
+function loadArray(id, score, points, assignment, overdue) {
     try {
         learner[row][0] = id;
-        learner[row][1] = score
-        learner[row][2] = points
-        learner[row][3] = overdue
-        learner[row][4] = row + 1
+        learner[row][1] = score;
+        learner[row][2] = points;
+        learner[row][3] = overdue;
+        learner[row][4] = assignment;
         ++row;
     } catch (error) {
         console.log(error)
@@ -208,10 +234,35 @@ function loadArray(id, score, points, overdue) {
 }
 
 function printResults(AssignmentGroup) {
+    
+    let missedAssignment = false;
+    let missedArray = [];
+    let missedCnt = 0;
+
     try {
-        let totalScore = 0, totalPoints = 0;
         console.log(`Learner ID: ${learner[0][0]}`)
 
+        let totalScore = 0, totalPoints = 0;
+
+        // Calculate total score using missed assignments
+        if (learner.length < nbrOfValidAsgmts) {
+            let notFound = true;
+            for (let c = 0; c < AssignmentGroup.AssignmentInfo.length - 1; c++) {
+                notFound = true;
+                for (let d = 0; d < learner.length; d++) {
+                    if (AssignmentGroup.AssignmentInfo[c].id === learner[d][4]) {
+                        notFound = false;
+                        break;
+                    }
+                }
+                if (notFound) {
+                    totalPoints += AssignmentGroup.AssignmentInfo[c].points_possible;
+                    missedAssignment = true;
+                    missedArray[missedCnt] = AssignmentGroup.AssignmentInfo[c].id;
+                    ++missedCnt;
+                }
+            }
+        }
         for (let a = 0; a < learner.length; a++) {
             totalScore += learner[a][1];
             totalPoints += learner[a][2];
@@ -224,6 +275,13 @@ function printResults(AssignmentGroup) {
             let calcScore = isNaN(learner[b][1]) ? 0 : learner[b][1] / learner[b][2] * 100;
             console.log(calcScore % 1 === 0 ? `Asgmt #${learner[b][4]} Score: ${calcScore}` : `Asgmt #${learner[b][4]} Score: ${(calcScore).toFixed(2)}`);
         }
+
+        if (missedAssignment) {
+            for (missedCnt = 0; missedCnt < missedArray.length; missedCnt++) {
+                console.log(`Asgmt #${missedArray[missedCnt]} Score: 0 (Missed Exam)`)
+            }
+        }
+        missedAssignment = false;
         console.log('')
     } catch (error) {
         console.log(error)

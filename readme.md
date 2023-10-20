@@ -13,7 +13,7 @@ JavaScript Requirements Met:
 10. Created functions checkForOverdue() and findFutureDueDates() to handle repetitive tasks.
 11. Outputted requested data. Scores are displayed as a percentages.
 12. No errors detected.
-13. 16 commits.
+13. 16+ commits.
 14. Readme
 
 Extras:
@@ -21,6 +21,7 @@ Extras:
 2. Added an alert that is triggered if the user enters a due date that is five years from the current date.
 3. Ensured values were entered for CourseInfo and AssignmentGroup name fields.
 4. Created a helper function to validate input
+5. Added logic to use possible points in overall average calculation from missed exams. 
 
 
 GitHub Link:
