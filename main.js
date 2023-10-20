@@ -139,46 +139,54 @@ let findFutureDueDates = function (dueDate) {
     // If entered due date is => five years into the future, confirm that the entry was intentional
     let oneDay = 24 * 60 * 60 * 1000;
     let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
-    if (yearsBetween >= 5) {
-        let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
-        let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
-        // Check the user's response and add code ...
-        response === null ? console.log("Reenter date.") : console.log("Future date accepted.");
-    }
+    // if (yearsBetween >= 5) {
+    //     let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
+    //     let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
+    //     // Check the user's response and add code ...
+    //     response === null ? console.log("Reenter date.") : console.log("Future date accepted.");
+    // }
     return dd.getTime() > td.getTime() ? true : false;
 }
-
+//Perform sort. Real world situations, the learner's id will not be in order
 LearnerSubmissions.sort((a, b) => a.learner_id - b.learner_id)
-console.log(LearnerSubmissions)
 
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
     // I'm passing the objects under the premise that they ARE NOT hardcoded
     checkAssignmentGrp(AssignmentGroup)
     checkLearnerSubm(LearnerSubmissions)
 
+    let row = 0;
+    let col = 2;
+    let learner = [[], []];
+    let firstLearner = LearnerSubmissions[0].learner_id;
     for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
         let total = 0, pct = 0, possPoints = 0, reduceBy10Pct = false;
+        let bypass = false, overdue = false;
         for (let i4 = 0; i4 < AssignmentGroup.AssignmentInfo.length; i4++) {
-            let bypass = false, overdue = false;
+            bypass = false, overdue = false;
             if (AssignmentGroup.AssignmentInfo[i4].id === LearnerSubmissions[i3].assignment_id) {
                 bypass = findFutureDueDates(AssignmentGroup.AssignmentInfo[i4].due_at)
                 if (bypass) {
                     break;
                 }
-                // console.log(AssignmentGroup.AssignmentInfo[i4].id + ": " + AssignmentGroup.AssignmentInfo[i4].due_at)
-                // console.log(LearnerSubmissions[i3].assignment_id + ": " + LearnerSubmissions[i3].learner_id + ": " + LearnerSubmissions[i3].submission.submitted_at)
                 overdue = checkForOverdue(AssignmentGroup.AssignmentInfo[i4].due_at, LearnerSubmissions[i3].submission.submitted_at)
                 if (overdue) {
                     reduceBy10Pct = true;
                 }
             }
         }
-        console.log(`Learner ID: ${LearnerSubmissions[i3].learner_id}`)
-        console.log(`Average: ${LearnerSubmissions[i3].submission.score}`)
+        if (!(bypass)) {
+            if (i3 > 0 && LearnerSubmissions[i3].learner_id !== LearnerSubmissions[i3 - 1].learner_id) {
+                ++row;
+                col = 0;
+
+            }
+            learner[row][col] = LearnerSubmissions[i3].learner_id;
+            learner[row][++col] = LearnerSubmissions[i3].submission.score;
+            console.log(`Learner ID: ${LearnerSubmissions[i3].learner_id}`)
+            console.log(`Average: ${LearnerSubmissions[i3].submission.score}`)
+        }
     }
 }
 
 let results = outcome(CourseInfo, AssignmentGroup, LearnerSubmissions);
-console.log(results);
-
-
