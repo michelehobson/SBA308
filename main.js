@@ -1,7 +1,7 @@
 let row = 0;
-let col = 5;
 let learner = [[], []];
-let nbrOfValidAsgmts = 0;
+let assignments = []
+let displayedMsg = false;
 
 const CourseInfo = {
     id: 451,
@@ -28,22 +28,22 @@ const AssignmentGroup = {
         },
         {
             id: 3,
-            name: "Code the World",
+            name: "Do Something",
             due_at: "3156-11-15",
-            points_possible: 500
+            points_possible: 150
+        },
+        {
+            id: 4,
+            name: "Code the World",
+            due_at: "2023-01-27",
+            points_possible: 100
+        },
+        {
+            id: 5,
+            name: "Can You Figure This Out",
+            due_at: "2023-05-23",
+            points_possible: 150
         }
-        // {
-        //     id: 3,
-        //     name: "Do Something",
-        //     due_at: "2023-01-27",
-        //     points_possible: 150
-        // },        
-        // {
-        //     id: 4,
-        //     name: "Code the World",
-        //     due_at: "3156-11-15",
-        //     points_possible: 500
-        // }
     ]
 };
 
@@ -155,7 +155,7 @@ let validateInput = function (CourseInfo, AssignmentGroup, LearnerSubmissions) {
 }
 
 let countUsableDates = function (AssignmentGroup) {
-    let tmp = 0;
+    let nbrOfValidAsgmts = 0;
     for (let count = 0; count < AssignmentGroup.AssignmentInfo.length; count++) {
         let dd = new Date(AssignmentGroup.AssignmentInfo[count].due_at);
         let td = new Date();
@@ -172,29 +172,32 @@ let findFutureDueDates = function (dueDate) {
     // If entered due date is => five years into the future, confirm that the entry was intentional
     let oneDay = 24 * 60 * 60 * 1000;
     let yearsBetween = (Math.round(Math.abs(dd - td) / oneDay) / 365);
-    if (yearsBetween >= 5) {
+    if (yearsBetween >= 5 && !displayedMsg) {
         let formattedDate = `${dd.getMonth()}/${dd.getDay()}/${dd.getFullYear()}`
         let response = prompt(`You have entered a due date of ${formattedDate}. \n \nChoose "OK" to accept this date \n -Or- \nChoose "Cancel" to reenter the date`)
         // Check the user's response and add code ...
         response === null ? console.log("Reenter date.") : console.log("Future date accepted.");
+        displayedMsg = true
     }
     return dd.getTime() > td.getTime() ? true : false;
 }
-//Perform sort. Real world situations, the learner's id will not be in order
-LearnerSubmissions.sort((a, b) => a.learner_id - b.learner_id)
 
 let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions) {
     try {
-        // I'm passing the objects under the premise that they ARE NOT hardcoded
         validateInput(CourseInfo, AssignmentGroup, LearnerSubmissions)
-        nbrOfValidAsgmts = countUsableDates(AssignmentGroup)
+        LearnerSubmissions.sort((a, b) => a.learner_id - b.learner_id || a.assignment_id - b.assignment_id)
+        learner = [[], []];
         learner.length = 1;
+        assignments = [];
+        assignments.length = 1;
         let learnerID = LearnerSubmissions[0].learner_id;
+        nbrOfValidAsgmts = countUsableDates(AssignmentGroup)
         for (let i3 = 0; i3 < LearnerSubmissions.length; i3++) {
             if (LearnerSubmissions[i3].learner_id !== learnerID && i3 !== LearnerSubmissions.length - 1) {
                 printResults(AssignmentGroup);
                 learnerID = LearnerSubmissions[i3].learner_id;
-                learner = [[], []]
+                learner = [[], []];
+                assignments = [];
                 row = 0;
             }
             let bypass = false, overdue = false;
@@ -211,6 +214,7 @@ let outcome = function getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmis
                         printResults(AssignmentGroup);
                     } else {
                         loadArray(LearnerSubmissions[i3].learner_id, LearnerSubmissions[i3].submission.score, AssignmentGroup.AssignmentInfo[i4].points_possible, LearnerSubmissions[i3].assignment_id, overdue);
+                        row++;
                     }
                 }
             }
@@ -227,44 +231,45 @@ function loadArray(id, score, points, assignment, overdue) {
         learner[row][2] = points;
         learner[row][3] = overdue;
         learner[row][4] = assignment;
-        ++row;
+
+        assignments[row] = assignment;
     } catch (error) {
         console.log(error)
     }
 }
 
 function printResults(AssignmentGroup) {
-    
-    let missedAssignment = false;
-    let missedArray = [];
-    let missedCnt = 0;
-
+    let totalScore = 0, totalPoints = 0;
     try {
-        console.log(`Learner ID: ${learner[0][0]}`)
 
-        let totalScore = 0, totalPoints = 0;
-
-        // Calculate total score using missed assignments
+        // CHECK FOR  MISSING ASSIGNMENTS
         if (learner.length < nbrOfValidAsgmts) {
-            let notFound = true;
-            for (let c = 0; c < AssignmentGroup.AssignmentInfo.length - 1; c++) {
-                notFound = true;
-                for (let d = 0; d < learner.length; d++) {
-                    if (AssignmentGroup.AssignmentInfo[c].id === learner[d][4]) {
-                        notFound = false;
-                        break;
+            let ids = [];
+            for (let i = 0; i < AssignmentGroup.AssignmentInfo.length; i++) {
+                let dd = new Date(AssignmentGroup.AssignmentInfo[i].due_at);
+                let td = new Date();
+                if (dd.getTime() <= td.getTime()) { ids.push(AssignmentGroup.AssignmentInfo[i].id); }
+            }
+            for (let i = 0; i < ids.length; i++) {
+                let examNbr = ids.filter((word) => !assignments.includes(word));
+            }
+            for (let i = 0; i < ids.length; i++) {
+                for (let j = 0; j < AssignmentGroup.AssignmentInfo.length; j++) {
+                    let alreadyExists = assignments.includes(ids[i]) ? true : false;
+                    if (AssignmentGroup.AssignmentInfo[j].id === ids[i] && !alreadyExists) {
+                        learner.push([learner[0][0], 0, AssignmentGroup.AssignmentInfo[j].points_possible, false, ids[i]]);
                     }
-                }
-                if (notFound) {
-                    totalPoints += AssignmentGroup.AssignmentInfo[c].points_possible;
-                    missedAssignment = true;
-                    missedArray[missedCnt] = AssignmentGroup.AssignmentInfo[c].id;
-                    ++missedCnt;
                 }
             }
         }
+        console.log(`Learner ID: ${learner[0][0]}`)
+
         for (let a = 0; a < learner.length; a++) {
-            totalScore += learner[a][1];
+            if (learner[a][3] === false) {
+                totalScore += learner[a][1];
+            } else {
+                totalScore += (learner[a][1] -= (learner[a][1] * .1)) 
+            }
             totalPoints += learner[a][2];
         }
 
@@ -273,15 +278,12 @@ function printResults(AssignmentGroup) {
 
         for (let b = 0; b < learner.length; b++) {
             let calcScore = isNaN(learner[b][1]) ? 0 : learner[b][1] / learner[b][2] * 100;
-            console.log(calcScore % 1 === 0 ? `Asgmt #${learner[b][4]} Score: ${calcScore}` : `Asgmt #${learner[b][4]} Score: ${(calcScore).toFixed(2)}`);
-        }
-
-        if (missedAssignment) {
-            for (missedCnt = 0; missedCnt < missedArray.length; missedCnt++) {
-                console.log(`Asgmt #${missedArray[missedCnt]} Score: 0 (Missed Exam)`)
+            if (calcScore !== 0) {
+                console.log(calcScore % 1 === 0 ? `Asgmt #${learner[b][4]} Score: ${calcScore}` : `Asgmt #${learner[b][4]} Score: ${(calcScore).toFixed(2)}`);
+            } else {
+                console.log(`Asgmt #${learner[b][4]} Score: 0 (Missed Exam)`)
             }
         }
-        missedAssignment = false;
         console.log('')
     } catch (error) {
         console.log(error)

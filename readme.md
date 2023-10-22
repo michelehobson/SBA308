@@ -22,15 +22,15 @@ Extras:
 3. Ensured values were entered for CourseInfo and AssignmentGroup name fields.
 4. Created a helper function to validate input
 5. Added logic to use possible points in overall average calculation from missed exams. 
-   
-   
-    *** Note: I ran out of time, but ONLY if I add additional exams to the Assignment Group object I receive:
-        TypeError: Cannot set properties of undefined (setting '0')
-            at loadArray (main.js:225:25)
-            at getLearnerData (main.js:213:25)
-            at main.js:291:15.
 
-        Adding data to JavaScript arrays is quirkkkky!
+
+Changes Since Submission:
+1. Changed LearnerSubmission sort to sort by learner_id and assignment_id.
+2. Moved sort statement into main function and not performed until user input passes validation.
+3. Changed the Asgmt # field to use AssignmentGroup.AssignmentInfo[#].id instead of LearnerSubmissions[#].assignment_id
+4. Modified the printResults function because I failed to include all possible missed exams. 
+5. Added logic for: I failed to deduct 10% of the total points for assignments that were turned in late.
+   
 
 
 
